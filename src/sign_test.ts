@@ -1,0 +1,98 @@
+import { assert } from "chai";
+import { MinPk, type Scheme } from "./index.js";
+import { run } from "./testing.js";
+import * as fs from "node:fs";
+import * as readline from "node:readline/promises";
+import * as path from "node:path";
+
+async function getRecords(fname: string): Promise<Uint8Array[][]> {
+    const rl = readline.createInterface({
+        input: fs.createReadStream(fname)
+    });
+
+    const out: Uint8Array[][] = [];
+    for await (const line of rl) {
+        const f = line.split(" ");
+        const rec = f.map((x) => new Uint8Array(Buffer.from(x, "hex")));
+        out.push(rec);
+    }
+    return out;
+}
+
+interface TestCase {
+    group: string;
+    scheme: Scheme;
+    files: string[];
+}
+
+const status = await run("minpk", async (ctx) => {
+    const cases: TestCase[] = [
+        {
+            group: "sig_g2_basic",
+            scheme: "basic",
+            files: [
+                "sig_g2_basic_fips_186_3_B233_blst",
+                "sig_g2_basic_fips_186_3_B283_blst",
+                "sig_g2_basic_fips_186_3_B409_blst",
+                "sig_g2_basic_fips_186_3_B571_blst",
+                "sig_g2_basic_fips_186_3_K233_blst",
+                "sig_g2_basic_fips_186_3_K409_blst",
+                "sig_g2_basic_fips_186_3_K571_blst",
+                "sig_g2_basic_fips_186_3_P224_blst",
+                "sig_g2_basic_fips_186_3_P256_blst",
+                "sig_g2_basic_fips_186_3_P384_blst",
+                "sig_g2_basic_fips_186_3_P521_blst",
+                "sig_g2_basic_rfc6979_blst"
+            ]
+        },
+        {
+            group: "sig_g2_aug",
+            scheme: "aug",
+            files: [
+                "sig_g2_aug_fips_186_3_B233_blst",
+                "sig_g2_aug_fips_186_3_B283_blst",
+                "sig_g2_aug_fips_186_3_B409_blst",
+                "sig_g2_aug_fips_186_3_B571_blst",
+                "sig_g2_aug_fips_186_3_K233_blst",
+                "sig_g2_aug_fips_186_3_K409_blst",
+                "sig_g2_aug_fips_186_3_K571_blst",
+                "sig_g2_aug_fips_186_3_P224_blst",
+                "sig_g2_aug_fips_186_3_P256_blst",
+                "sig_g2_aug_fips_186_3_P384_blst",
+                "sig_g2_aug_fips_186_3_P521_blst",
+                "sig_g2_aug_rfc6979_blst"
+            ]
+        }
+    ];
+
+    for (const group of cases) {
+        await run(group.group, async (ctx) => {
+            for (const file of group.files) {
+                await run(file, async () => {
+                    const records = await getRecords(path.resolve("./vectors", group.group, file));
+                    for (const rec of records) {
+                        const [msg, ikm, result] = rec;
+                        if (ikm.length < 32) {
+                            continue;
+                        }
+                        const priv = MinPk.PrivateKey.generate(ikm);
+                        const sig = priv.sign(msg, group.scheme);
+                        assert.strictEqual(sig.valid(true), true, "invalid signature");
+                        assert.deepEqual(sig.bytes(), result, "signatures are not equal");
+
+                        const pub = priv.public();
+                        assert.strictEqual(pub.valid(), true, "invalid pubkey");
+
+                        const res = sig.verify(group.scheme, pub, msg);
+                        assert.strictEqual(res, true, "verify failed");
+
+                        const res1 = sig.aggregateVerify(group.scheme, [pub, msg]);
+                        assert.strictEqual(res1, true, "aggregate verify failed");
+                    }
+                }, ctx);
+            }
+        }, ctx);
+    }
+});
+
+process.exit(status ? 0 : 1);

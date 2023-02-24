@@ -1,0 +1,38 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+        "standard-with-typescript"
+    ],
+    "overrides": [],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "project": true,
+        "tsconfigRootDir": "__dirname"
+    },
+    "rules": {
+        "@typescript-eslint/indent": "off",
+        "@typescript-eslint/quotes": "off",
+        "@typescript-eslint/semi": [
+            "error",
+            "always"
+        ],
+        "@typescript-eslint/space-before-function-paren": [
+            "error",
+            {
+                "anonymous": "always",
+                "named": "never",
+                "asyncArrow": "always"
+            }
+        ],
+        "@typescript-eslint/member-delimiter-style": [
+            "error",
+            {}
+        ],
+        "@typescript-eslint/array-type": "off"
+    }
+}

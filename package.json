@@ -1,0 +1,30 @@
+{
+  "name": "ts-blst",
+  "version": "1.0.0",
+  "description": "TS binding to blst BLS12-381 signature library",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Eugene Zagidullin <eugene@ecadlabs.com>",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "signature.json"
+  ],
+  "devDependencies": {
+    "@types/chai": "^4.3.4",
+    "@types/node": "^18.14.1",
+    "@typescript-eslint/eslint-plugin": "^5.53.0",
+    "@typescript-eslint/parser": "^5.53.0",
+    "chai": "^4.3.7",
+    "eslint": "^8.34.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-standard-with-typescript": "^34.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "typescript": "^4.9.5"
+  }
+}

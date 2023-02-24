@@ -1,0 +1,7 @@
+{
+    "C_Cpp.formatting": "clangFormat",
+    "C_Cpp.loggingLevel": "Warning",
+    "[typescript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    }
+}

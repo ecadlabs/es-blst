@@ -1,7 +1,7 @@
 {
-  "name": "ts-blst",
+  "name": "es-blst",
   "version": "1.0.0",
-  "description": "TS binding to blst BLS12-381 signature library",
+  "description": "ES binding to blst BLS12-381 signature library using Wasm",
   "type": "module",
   "main": "./dist/index.js",
   "scripts": {

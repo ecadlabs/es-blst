@@ -670,6 +670,78 @@ export class BlstWrapper {
         this.alloc.disposeFrame(sp);
         return ok;
     }
+
+    core_aggregate_verify_g2(
+        sigP1a: Uint8Array,
+        sigCk: boolean,
+        pairs: PkMsgPair[],
+        pkCk: boolean,
+        hash: boolean,
+        suite: Uint8Array
+    ): boolean {
+        const [sp, [vmCtx, vmSig, vmDst]] = this.alloc.allocateFrame(
+            this.sizeof.pairing,
+            this.sizeof.p1_affine,
+            suite.byteLength
+        );
+        vmSig.set(sigP1a);
+        vmDst.set(suite);
+        const vmPairs = pairs.map<PkMsgPair>((p) => {
+            const [, [pk, msg, aug]] =
+                p.aug != null
+                    ? this.alloc.allocateFrame(
+                        this.sizeof.p2_affine,
+                        p.msg.byteLength,
+                        p.aug.byteLength
+                    )
+                    : this.alloc.allocateFrame(this.sizeof.p2_affine, p.msg.byteLength);
+            pk.set(p.pk);
+            msg.set(p.msg);
+            if (p.aug != null && aug != null) {
+                aug.set(p.aug);
+            }
+            return { pk, msg, aug };
+        });
+
+        this.api.blst_pairing_init(
+            vmCtx.byteOffset,
+            hash ? 1 : 0,
+            vmDst.byteOffset,
+            vmDst.byteLength
+        );
+        let ok = true;
+        for (const [i, p] of vmPairs.entries()) {
+            const err = this.api.blst_pairing_chk_n_aggr_pk_in_g2(
+                vmCtx.byteOffset,
+                p.pk.byteOffset,
+                pkCk ? 1 : 0,
+                i === 0 ? vmSig.byteOffset : 0,
+                0,
+                p.msg.byteOffset,
+                p.msg.byteLength,
+                p.aug != null ? p.aug?.byteOffset : 0,
+                p.aug != null ? p.aug?.byteLength : 0
+            );
+            switch (err) {
+                case Err.SUCCESS:
+                    break;
+                case (Err.PK_IS_INFINITY, Err.POINT_NOT_IN_GROUP):
+                    ok = false;
+                    break;
+                default:
+                    this.alloc.disposeFrame(sp);
+                    throw new BlstError(err);
+            }
+        }
+        this.api.blst_pairing_commit(vmCtx.byteOffset);
+        if (ok) {
+            ok =
+                (!sigCk || this.api.blst_p1_affine_in_g1(vmSig.byteOffset) !== 0) &&
+                this.api.blst_pairing_finalverify(vmCtx.byteOffset, 0) !== 0;
+        }
+        this.alloc.disposeFrame(sp);
+        return ok;
+    }
 }
 
 function alignSize(x: number): number {
@@ -691,15 +763,9 @@ class Allocator {
     allocateFrame(l0: number): [number, [Uint8Array]];
     allocateFrame(l0: number, l1: number): [number, [Uint8Array, Uint8Array]];
     allocateFrame(l0: number, l1: number, l2: number): [number, [Uint8Array, Uint8Array, Uint8Array]];
-    allocateFrame(l0: number, l1: number, l2: number, l3: number
-    ): [number, [Uint8Array, Uint8Array, Uint8Array, Uint8Array]];
-    allocateFrame(l0: number, l1: number, l2: number, l3: number, l4: number
-    ): [number, [Uint8Array, Uint8Array, Uint8Array, Uint8Array, Uint8Array]];
-    allocateFrame(l0: number, l1: number, l2: number, l3: number, l4: number, l5: number
-    ): [
-            number,
-            [Uint8Array, Uint8Array, Uint8Array, Uint8Array, Uint8Array, Uint8Array]
-        ];
+    allocateFrame(l0: number, l1: number, l2: number, l3: number): [number, [Uint8Array, Uint8Array, Uint8Array, Uint8Array]];
+    allocateFrame(l0: number, l1: number, l2: number, l3: number, l4: number): [number, [Uint8Array, Uint8Array, Uint8Array, Uint8Array, Uint8Array]];
+    allocateFrame(l0: number, l1: number, l2: number, l3: number, l4: number, l5: number): [number, [Uint8Array, Uint8Array, Uint8Array, Uint8Array, Uint8Array, Uint8Array]];
     allocateFrame(...lengths: number[]): [number, Uint8Array[]];
     allocateFrame(...lengths: number[]): [number, Uint8Array[]] {
         const total = lengths.reduce((acc, val) => acc + alignSize(val), 0);

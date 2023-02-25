@@ -9,7 +9,9 @@ export async function run(title: string | null, cb: (ctx: Context) => Promise<vo
     const ctx = {
         title: title !== null
             ? [...(context.title != null ? context.title : []), title]
-            : [...(context.title != null ? context.title : [])],
+            : context.title != null
+                ? [...context.title, "<unnamed>"]
+                : undefined,
         status: true
     };
     let error: Error | undefined;
@@ -26,7 +28,7 @@ export async function run(title: string | null, cb: (ctx: Context) => Promise<vo
         context.status = false;
     }
 
-    console.log(`* ${ctx.title.join("/")}: ${ctx.status ? "ok" : "fail"}`);
+    console.log(`* ${ctx.title != null ? ctx.title.join("/") : "All"}: ${ctx.status ? "ok" : "fail"}`);
     if (error != null) {
         console.log("Error message:");
         console.log(error.stack != null ? error.stack : error.message);

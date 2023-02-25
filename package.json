@@ -5,12 +5,21 @@
   "type": "module",
   "main": "./dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "make -C ./binding && tsc",
+    "test": "make -C ./binding && tsc && node ./dist/sign_test.js"
   },
   "author": "Eugene Zagidullin <eugene@ecadlabs.com>",
   "license": "MIT",
   "files": [
-    "dist",
+    "dist/blst.d.ts",
+    "dist/blst.js",
+    "dist/blst.wasm",
+    "dist/index.d.ts",
+    "dist/index.js",
+    "dist/minpk.d.ts",
+    "dist/minpk.js",
+    "dist/minsig.d.ts",
+    "dist/minsig.js",
     "signature.json"
   ],
   "devDependencies": {

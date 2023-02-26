@@ -50,12 +50,15 @@ export class PublicKey {
     }
 
     equal(other: PublicKey): boolean {
+        if (!(other instanceof PublicKey)) {
+            return false;
+        }
         return Blst.p2_affine_is_equal(this._point, other._point);
     }
 }
 
 export class Signature {
-    private constructor(private readonly point: Uint8Array) { }
+    private constructor(readonly _point: Uint8Array) { }
 
     static fromBytes(bytes: Uint8Array): Signature {
         return new Signature(Blst.p1_uncompress(bytes));
@@ -66,32 +69,59 @@ export class Signature {
     }
 
     bytes(): Uint8Array {
-        return Blst.p1_affine_compress(this.point);
+        return Blst.p1_affine_compress(this._point);
     }
 
     aggregateVerify(scheme: Scheme, ...pairs: [PublicKey, Uint8Array][]): boolean {
-        const verifyPairs = pairs.map<PkMsgPair>(([pk, msg]) => ({
-            pk: pk._point,
-            msg,
-            aug: scheme === "aug" ? pk.bytes() : undefined
-        }));
-        return Blst.core_aggregate_verify_g2(this.point, true, verifyPairs, true, true, getSuite(scheme, 1));
+        const verifyPairs = pairs.map<PkMsgPair>(([pk, msg]) => {
+            if (!(pk instanceof PublicKey)) {
+                throw new Error("invalid public key");
+            }
+            return {
+                pk: pk._point,
+                msg,
+                aug: scheme === "aug" ? pk.bytes() : undefined
+            };
+        });
+        return Blst.core_aggregate_verify_g2(this._point, true, verifyPairs, true, true, getSuite(scheme, 1));
     }
 
     verify(scheme: Scheme, pk: PublicKey, msg: Uint8Array): boolean {
+        if (!(pk instanceof PublicKey)) {
+            throw new Error("invalid public key");
+        }
         const aug = scheme === "aug" ? pk.bytes() : undefined;
-        return Blst.core_verify_pk_in_g2(pk._point, this.point, true, msg, getSuite(scheme, 1), aug);
+        return Blst.core_verify_pk_in_g2(pk._point, this._point, true, msg, getSuite(scheme, 1), aug);
     }
 
     valid(groupCheck: boolean = false): boolean {
-        return !Blst.p1_affine_is_inf(this.point) && (!groupCheck || Blst.p1_affine_in_g1(this.point));
+        return !Blst.p1_affine_is_inf(this._point) && (!groupCheck || Blst.p1_affine_in_g1(this._point));
     }
 
     onCurve(): boolean {
-        return Blst.p1_affine_on_curve(this.point);
+        return Blst.p1_affine_on_curve(this._point);
     }
 
     equal(other: Signature): boolean {
-        return Blst.p1_affine_is_equal(this.point, other.point);
+        if (!(other instanceof Signature)) {
+            throw new Error("invalid signature");
+        }
+        return Blst.p1_affine_is_equal(this._point, other._point);
     }
+}
+
+export function aggregateSignatures(...src: Signature[]): Signature {
+    if (src.length === 0) {
+        throw new Error("zero arguments");
+    }
+    src.forEach((x) => {
+        if (!(x instanceof Signature)) {
+            throw new Error("invalid signature");
+        }
+    });
+    let acc = Blst.p1_from_affine(src[0]._point);
+    for (let i = 1; i < src.length; i++) {
+        acc = Blst.p1_add_or_double_affine(acc, src[i]._point);
+    }
+    return Signature.fromPoint(Blst.p1_to_affine(acc));
 }

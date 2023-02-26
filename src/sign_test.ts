@@ -94,6 +94,29 @@ const status = await run(null, async () => {
                 }
             }, ctx);
         }
+
+        await run("aggregate", async () => {
+            const numSig = 4;
+            const pairs: [MinPk.PublicKey, Uint8Array][] = [];
+            const sigs: MinPk.Signature[] = [];
+
+            for (let i = 0; i < numSig; i++) {
+                const ikm = new Uint8Array(32);
+                crypto.getRandomValues(ikm);
+
+                const msg = new Uint8Array(32);
+                crypto.getRandomValues(msg);
+
+                const sk = MinPk.PrivateKey.generate(ikm);
+                const sig = sk.sign(msg, "basic");
+                const pk = sk.public();
+                sigs.push(sig);
+                pairs.push([pk, msg]);
+            }
+
+            const aggregated = MinPk.aggregateSignatures(...sigs);
+            assert.strictEqual(aggregated.aggregateVerify("basic", ...pairs), true, "aggregate verify failed");
+        }, ctx);
     });
 
     await run("minsig", async (ctx) => {
@@ -164,6 +187,29 @@ const status = await run(null, async () => {
                 }
             }, ctx);
         }
+
+        await run("aggregate", async () => {
+            const numSig = 4;
+            const pairs: [MinSig.PublicKey, Uint8Array][] = [];
+            const sigs: MinSig.Signature[] = [];
+
+            for (let i = 0; i < numSig; i++) {
+                const ikm = new Uint8Array(32);
+                crypto.getRandomValues(ikm);
+
+                const msg = new Uint8Array(32);
+                crypto.getRandomValues(msg);
+
+                const sk = MinSig.PrivateKey.generate(ikm);
+                const sig = sk.sign(msg, "basic");
+                const pk = sk.public();
+                sigs.push(sig);
+                pairs.push([pk, msg]);
+            }
+
+            const aggregated = MinSig.aggregateSignatures(...sigs);
+            assert.strictEqual(aggregated.aggregateVerify("basic", ...pairs), true, "aggregate verify failed");
+        }, ctx);
     });
 });
 

@@ -137,6 +137,18 @@ interface Exports {
     //     const byte *aug DEFNULL,
     //     size_t aug_len DEFNULL);
     blst_core_verify_pk_in_g2: (pk_p2a: I32, sig_p1a: I32, hash_or_encode: I32, msg: I32, msg_len: I32, DST: I32, DST_len: I32, aug: I32, aug_len: I32) => I32;
+    // void blst_p1_add_or_double_affine(blst_p1 *out, const blst_p1 *a, const blst_p1_affine *b);
+    blst_p1_add_or_double_affine: (out_p1: I32, a_p1: I32, b_p1a: I32) => void;
+    // void blst_p2_add_or_double_affine(blst_p2 *out, const blst_p2 *a, const blst_p2_affine *b);
+    blst_p2_add_or_double_affine: (out_p2: I32, a_p2: I32, b_p2a: I32) => void;
+    // void blst_p1_from_affine(blst_p1 *out, const blst_p1_affine *in);
+    blst_p1_from_affine: (out_p1: I32, in_p1a: I32) => void;
+    // void blst_p2_from_affine(blst_p2 *out, const blst_p2_affine *in);
+    blst_p2_from_affine: (out_p2: I32, in_p2a: I32) => void;
+    // void blst_p1_to_affine(blst_p1_affine *out, const blst_p1 *in);
+    blst_p1_to_affine: (out_p1a: I32, in_p1: I32) => void;
+    // void blst_p2_to_affine(blst_p2_affine *out, const blst_p2 *in);
+    blst_p2_to_affine: (out_p2a: I32, in_p2: I32) => void;
 }
 
 export class BlstWrapper {
@@ -741,6 +753,82 @@ export class BlstWrapper {
         }
         this.alloc.disposeFrame(sp);
         return ok;
+    }
+
+    p1_add_or_double_affine(aP1: Uint8Array, bP1a: Uint8Array): Uint8Array {
+        const [sp, [vmOut, vmA, vmB]] = this.alloc.allocateFrame(
+            this.sizeof.p1,
+            this.sizeof.p1,
+            this.sizeof.p1_affine
+        );
+        vmA.set(aP1);
+        vmB.set(bP1a);
+        this.api.blst_p1_add_or_double_affine(vmOut.byteOffset, vmA.byteOffset, vmB.byteOffset);
+        const out = new Uint8Array(vmOut);
+        this.alloc.disposeFrame(sp);
+        return out;
+    }
+
+    p2_add_or_double_affine(aP2: Uint8Array, bP2a: Uint8Array): Uint8Array {
+        const [sp, [vmOut, vmA, vmB]] = this.alloc.allocateFrame(
+            this.sizeof.p2,
+            this.sizeof.p2,
+            this.sizeof.p2_affine
+        );
+        vmA.set(aP2);
+        vmB.set(bP2a);
+        this.api.blst_p2_add_or_double_affine(vmOut.byteOffset, vmA.byteOffset, vmB.byteOffset);
+        const out = new Uint8Array(vmOut);
+        this.alloc.disposeFrame(sp);
+        return out;
+    }
+
+    p1_from_affine(inP1a: Uint8Array): Uint8Array {
+        const [sp, [vmOut, vmIn]] = this.alloc.allocateFrame(
+            this.sizeof.p1,
+            this.sizeof.p1_affine
+        );
+        vmIn.set(inP1a);
+        this.api.blst_p1_from_affine(vmOut.byteOffset, vmIn.byteOffset);
+        const out = new Uint8Array(vmOut);
+        this.alloc.disposeFrame(sp);
+        return out;
+    }
+
+    p2_from_affine(inP2a: Uint8Array): Uint8Array {
+        const [sp, [vmOut, vmIn]] = this.alloc.allocateFrame(
+            this.sizeof.p2,
+            this.sizeof.p2_affine
+        );
+        vmIn.set(inP2a);
+        this.api.blst_p2_from_affine(vmOut.byteOffset, vmIn.byteOffset);
+        const out = new Uint8Array(vmOut);
+        this.alloc.disposeFrame(sp);
+        return out;
+    }
+
+    p1_to_affine(inP1: Uint8Array): Uint8Array {
+        const [sp, [vmOut, vmIn]] = this.alloc.allocateFrame(
+            this.sizeof.p1_affine,
+            this.sizeof.p1
+        );
+        vmIn.set(inP1);
+        this.api.blst_p1_to_affine(vmOut.byteOffset, vmIn.byteOffset);
+        const out = new Uint8Array(vmOut);
+        this.alloc.disposeFrame(sp);
+        return out;
+    }
+
+    p2_to_affine(inP2: Uint8Array): Uint8Array {
+        const [sp, [vmOut, vmIn]] = this.alloc.allocateFrame(
+            this.sizeof.p2_affine,
+            this.sizeof.p2
+        );
+        vmIn.set(inP2);
+        this.api.blst_p2_to_affine(vmOut.byteOffset, vmIn.byteOffset);
+        const out = new Uint8Array(vmOut);
+        this.alloc.disposeFrame(sp);
+        return out;
     }
 }
 

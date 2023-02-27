@@ -12,4 +12,4 @@ all: $(OUT)
 
 $(OUT): $(SRC)
 	mkdir -p $(dir $@)
-	PATH=$(LLVMPATH):$(PATH) clang $(CFLAGS) $(INCLUDE) -o $@ $^
+	PATH="$(LLVMPATH):$(PATH)" clang $(CFLAGS) $(INCLUDE) -o $@ $^

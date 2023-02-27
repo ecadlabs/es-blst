@@ -6,10 +6,11 @@ INCLUDE = -I../blst/src \
 OUT = ../dist/blst.wasm
 
 CFLAGS = --target=wasm32 -D__BLST_NO_ASM__ -O2 -mbulk-memory -nostdlib -Wl,--no-entry -Wl,--export-all
-LLVMPATH = /opt/homebrew/opt/llvm/bin
+LLVMPATH = /opt/homebrew/opt/llvm/bin:/usr/local/opt/llvm/bin
 
 all: $(OUT)
 
 $(OUT): $(SRC)
 	mkdir -p $(dir $@)
-	PATH="$(LLVMPATH):$(PATH)" clang $(CFLAGS) $(INCLUDE) -o $@ $^
+	PATH="$(LLVMPATH):$(PATH)"
+	clang $(CFLAGS) $(INCLUDE) -o $@ $^

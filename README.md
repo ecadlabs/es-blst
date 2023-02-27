@@ -7,7 +7,18 @@ ES2022 environment for asynchronous instantiating of the Wasm module during load
 ## Build
 
 ### Prerequisites
-clang >= 9.0 installed in the search path or in `/opt/homebrew/opt/llvm/bin`
+Clang >= 9.0 with `wasm32` target available
+
+#### MacOS
+By default Homebrew doesn't link LLVM executables into its global executables directory which is usually listed in PATH.
+To build on MacOS you have to add LLVM directory (usually `/opt/homebrew/opt/llvm/bin` or `/usr/local/opt/llvm/bin`
+depending on Homebrew version) to PATH:
+
+```sh
+export PATH="/opt/homebrew/opt/llvm/bin:${PATH}"
+```
+
+The exact path will be printed after LLVM installation is finished.
 
 ### Building
 ```sh

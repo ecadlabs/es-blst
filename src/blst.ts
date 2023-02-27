@@ -40,8 +40,12 @@ export interface PkMsgPair {
     aug?: Uint8Array;
 }
 
+/**
+ * blst export section type
+ */
 interface Exports {
     memory: WebAssembly.Memory;
+    // always provided by LLVM linker
     __heap_base: WebAssembly.Global;
 
     blst_scalar_sizeof: () => I32;
@@ -151,6 +155,11 @@ interface Exports {
     blst_p2_to_affine: (out_p2a: I32, in_p2: I32) => void;
 }
 
+/**
+ * A glue class responsible for passing arguments to blst functions and returning results by copying them in and out
+ * of Wasm instance's memory. All non-primitive types are represented as Uint8Array's holding copies of in-memory
+ * representation of blst types. It allows to use extremely simple memory allocation scheme.
+ */
 export class BlstWrapper {
     private readonly alloc: Allocator;
     private readonly api: Exports;
@@ -611,6 +620,7 @@ export class BlstWrapper {
         }
     }
 
+    // higher level method which is kept here to avoid copying in and out heavy pairing context
     core_aggregate_verify_g1(
         sigP2a: Uint8Array,
         sigCk: boolean,
@@ -683,6 +693,7 @@ export class BlstWrapper {
         return ok;
     }
 
+    // higher level method which is kept here to avoid copying in and out heavy pairing context
     core_aggregate_verify_g2(
         sigP1a: Uint8Array,
         sigCk: boolean,
@@ -836,6 +847,9 @@ function alignSize(x: number): number {
     return ((x | 0) + (7 | 0)) & ~(7 | 0);
 }
 
+/**
+ * Simple stack-like heap allocator
+ */
 class Allocator {
     private readonly heapBase: number;
     private top: number;

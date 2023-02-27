@@ -5,6 +5,7 @@
   "type": "module",
   "main": "./dist/index.js",
   "scripts": {
+    "init": "git submodule update --init --recursive",
     "build": "make -C ./binding && tsc",
     "test": "make -C ./binding && tsc && node ./dist/sign_test.js"
   },

@@ -1,7 +1,7 @@
 const PageSize = (64 * 1024) | 0;
-const P1CompressedByteLength = 48 | 0;
-const P2CompressedByteLength = 96 | 0;
-const ScalarByteLength = 32 | 0;
+export const P1CompressedByteLength = 48 | 0;
+export const P2CompressedByteLength = 96 | 0;
+export const ScalarByteLength = 32 | 0;
 
 export enum Err {
     SUCCESS,

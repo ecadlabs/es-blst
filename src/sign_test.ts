@@ -28,6 +28,24 @@ interface TestCase {
 
 const status = await run(null, async (ctx) => {
     await run("minpk", async (ctx) => {
+        await run("encode", async () => {
+            const ikm = new Uint8Array(32);
+            crypto.getRandomValues(ikm);
+
+            const sk = MinPk.PrivateKey.generate(ikm);
+            const encSk = sk.bytes();
+            assert.equal(encSk.length, MinPk.PrivateKey.ByteLength);
+
+            const decSk = MinPk.PrivateKey.fromBytes(encSk);
+            assert.deepEqual(decSk, sk);
+
+            const pk = sk.public();
+            const encPk = pk.bytes();
+            assert.equal(encPk.length, MinPk.PublicKey.ByteLength);
+            const decPk = MinPk.PublicKey.fromBytes(encPk);
+            assert.equal(decPk.equal(pk), true);
+        }, ctx);
+
         const cases: TestCase[] = [
             {
                 group: "sig_g2_basic",
@@ -121,6 +139,24 @@ const status = await run(null, async (ctx) => {
     }, ctx);
 
     await run("minsig", async (ctx) => {
+        await run("encode", async () => {
+            const ikm = new Uint8Array(32);
+            crypto.getRandomValues(ikm);
+
+            const sk = MinSig.PrivateKey.generate(ikm);
+            const encSk = sk.bytes();
+            assert.equal(encSk.length, MinSig.PrivateKey.ByteLength);
+
+            const decSk = MinSig.PrivateKey.fromBytes(encSk);
+            assert.deepEqual(decSk, sk);
+
+            const pk = sk.public();
+            const encPk = pk.bytes();
+            assert.equal(encPk.length, MinSig.PublicKey.ByteLength);
+            const decPk = MinSig.PublicKey.fromBytes(encPk);
+            assert.equal(decPk.equal(pk), true);
+        }, ctx);
+
         const cases: TestCase[] = [
             {
                 group: "sig_g1_basic",

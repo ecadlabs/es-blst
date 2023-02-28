@@ -1,10 +1,14 @@
 /**
  * Minimal-pubkey-size: public keys are points in G1, signatures are points in G2
  */
-
-import { Blst, getSuite, type Scheme, type PkMsgPair } from "./blst.js";
+import {
+    Blst, getSuite, type Scheme, type PkMsgPair,
+    ScalarByteLength, P1CompressedByteLength, P2CompressedByteLength
+} from "./blst.js";
 
 export class PrivateKey {
+    static readonly ByteLength = ScalarByteLength;
+
     private constructor(private readonly scalar: Uint8Array) { }
 
     static generate(ikm: Uint8Array): PrivateKey {
@@ -32,6 +36,8 @@ export class PrivateKey {
 }
 
 export class PublicKey {
+    static readonly ByteLength = P1CompressedByteLength;
+
     private constructor(public readonly _point: Uint8Array) { }
 
     static fromBytes(bytes: Uint8Array): PublicKey {
@@ -63,6 +69,8 @@ export class PublicKey {
 }
 
 export class Signature {
+    static readonly ByteLength = P2CompressedByteLength;
+
     private constructor(readonly _point: Uint8Array) { }
 
     static fromBytes(bytes: Uint8Array): Signature {

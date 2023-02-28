@@ -4,6 +4,7 @@ import { run } from "./testing.js";
 import * as fs from "node:fs";
 import * as readline from "node:readline/promises";
 import * as path from "node:path";
+import * as crypto from "node:crypto";
 
 async function getRecords(fname: string): Promise<Uint8Array[][]> {
     const rl = readline.createInterface({

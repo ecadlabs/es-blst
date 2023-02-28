@@ -2,6 +2,17 @@
   "name": "es-blst",
   "version": "1.0.0",
   "description": "ES binding to blst BLS12-381 signature library using Wasm",
+  "homepage": "https://github.com/ecadlabs/es-blst#readme",
+  "keywords": [
+    "crypto",
+    "bls12-381",
+    "bls",
+    "signature"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecadlabs/es-blst.git"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "scripts": {

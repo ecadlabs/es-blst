@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { MinPk, MinSig, type Scheme } from "./index.js";
 import { run } from "./testing.js";
 import * as fs from "node:fs";
-import * as readline from "node:readline/promises";
+import * as readline from "node:readline";
 import * as path from "node:path";
 import * as crypto from "node:crypto";
 
@@ -29,8 +29,7 @@ interface TestCase {
 const status = await run(null, async (ctx) => {
     await run("minpk", async (ctx) => {
         await run("encode", async () => {
-            const ikm = new Uint8Array(32);
-            crypto.getRandomValues(ikm);
+            const ikm = new Uint8Array(crypto.randomBytes(32));
 
             const sk = MinPk.PrivateKey.generate(ikm);
             const encSk = sk.bytes();
@@ -120,11 +119,8 @@ const status = await run(null, async (ctx) => {
             const sigs: MinPk.Signature[] = [];
 
             for (let i = 0; i < numSig; i++) {
-                const ikm = new Uint8Array(32);
-                crypto.getRandomValues(ikm);
-
-                const msg = new Uint8Array(32);
-                crypto.getRandomValues(msg);
+                const ikm = new Uint8Array(crypto.randomBytes(32));
+                const msg = new Uint8Array(crypto.randomBytes(32));
 
                 const sk = MinPk.PrivateKey.generate(ikm);
                 const sig = sk.sign(msg, "basic");
@@ -140,8 +136,7 @@ const status = await run(null, async (ctx) => {
 
     await run("minsig", async (ctx) => {
         await run("encode", async () => {
-            const ikm = new Uint8Array(32);
-            crypto.getRandomValues(ikm);
+            const ikm = new Uint8Array(crypto.randomBytes(32));
 
             const sk = MinSig.PrivateKey.generate(ikm);
             const encSk = sk.bytes();
@@ -231,11 +226,8 @@ const status = await run(null, async (ctx) => {
             const sigs: MinSig.Signature[] = [];
 
             for (let i = 0; i < numSig; i++) {
-                const ikm = new Uint8Array(32);
-                crypto.getRandomValues(ikm);
-
-                const msg = new Uint8Array(32);
-                crypto.getRandomValues(msg);
+                const ikm = new Uint8Array(crypto.randomBytes(32));
+                const msg = new Uint8Array(crypto.randomBytes(32));
 
                 const sk = MinSig.PrivateKey.generate(ikm);
                 const sig = sk.sign(msg, "basic");

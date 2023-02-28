@@ -910,8 +910,8 @@ export const Blst = new BlstWrapper(
         await (async () => {
             const url = new URL("./blst.wasm", import.meta.url);
             if (typeof window === "undefined") {
-                const fs = await import("node:fs/promises");
-                const buf = await fs.readFile(url);
+                const fs = await import("node:fs");
+                const buf = fs.readFileSync(url);
                 return await WebAssembly.instantiate(buf);
             } else {
                 return await WebAssembly.instantiateStreaming(fetch(url));

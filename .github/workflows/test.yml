@@ -9,7 +9,7 @@ jobs:
           submodules: true
       - uses: actions/setup-node@v3
         with:
-          node-version: 17
+          node-version: 18
       - run: sudo apt-get install clang
       - run: npm ci
       - run: npm run build

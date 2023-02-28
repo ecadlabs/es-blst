@@ -25,7 +25,7 @@ interface TestCase {
     files: string[];
 }
 
-const status = await run(null, async () => {
+const status = await run(null, async (ctx) => {
     await run("minpk", async (ctx) => {
         const cases: TestCase[] = [
             {
@@ -117,7 +117,7 @@ const status = await run(null, async () => {
             const aggregated = MinPk.aggregateSignatures(...sigs);
             assert.strictEqual(aggregated.aggregateVerify("basic", pairs), true, "aggregate verify failed");
         }, ctx);
-    });
+    }, ctx);
 
     await run("minsig", async (ctx) => {
         const cases: TestCase[] = [
@@ -210,7 +210,7 @@ const status = await run(null, async () => {
             const aggregated = MinSig.aggregateSignatures(...sigs);
             assert.strictEqual(aggregated.aggregateVerify("basic", pairs), true, "aggregate verify failed");
         }, ctx);
-    });
+    }, ctx);
 });
 
 process.exit(status ? 0 : 1);

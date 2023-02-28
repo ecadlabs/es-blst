@@ -28,7 +28,11 @@ export async function run(title: string | null, cb: (ctx: Context) => Promise<vo
         context.status = false;
     }
 
-    console.log(`* ${ctx.title != null ? ctx.title.join("/") : "All"}: ${ctx.status ? "ok" : "fail"}`);
+    if (ctx.title != null) {
+        console.log(`* ${ctx.title.join("/")}: ${ctx.status ? "ok" : "fail"}`);
+    } else {
+        console.log(`All: ${ctx.status ? "ok" : "fail"}`);
+    }
     if (error != null) {
         console.log("Error message:");
         console.log(error.stack != null ? error.stack : error.message);

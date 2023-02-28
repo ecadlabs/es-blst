@@ -23,9 +23,10 @@ export class PrivateKey {
         return PublicKey.fromPoint(Blst.sk_to_pk2_in_g2(this.scalar));
     }
 
-    sign(msg: Uint8Array, scheme: Scheme): Signature {
+    sign(msg: Uint8Array, scheme: Scheme, cipherSuite?: string): Signature {
+        const suite = cipherSuite != null ? new TextEncoder().encode(cipherSuite) : getSuite(scheme, 1);
         const aug = scheme === "aug" ? this.public().bytes() : undefined;
-        const q = Blst.hash_to_g1(msg, getSuite(scheme, 1), aug);
+        const q = Blst.hash_to_g1(msg, suite, aug);
         return Signature.fromPoint(Blst.sign_pk2_in_g2(q, this.scalar));
     }
 }
@@ -76,7 +77,8 @@ export class Signature {
         return Blst.p1_affine_compress(this._point);
     }
 
-    aggregateVerify(scheme: Scheme, ...pairs: [PublicKey, Uint8Array][]): boolean {
+    aggregateVerify(scheme: Scheme, pairs: [PublicKey, Uint8Array][], cipherSuite?: string): boolean {
+        const suite = cipherSuite != null ? new TextEncoder().encode(cipherSuite) : getSuite(scheme, 1);
         const verifyPairs = pairs.map<PkMsgPair>(([pk, msg]) => {
             if (!(pk instanceof PublicKey)) {
                 throw new Error("invalid public key");
@@ -87,15 +89,16 @@ export class Signature {
                 aug: scheme === "aug" ? pk.bytes() : undefined
             };
         });
-        return Blst.core_aggregate_verify_g2(this._point, true, verifyPairs, true, true, getSuite(scheme, 1));
+        return Blst.core_aggregate_verify_g2(this._point, true, verifyPairs, true, true, suite);
     }
 
-    verify(scheme: Scheme, pk: PublicKey, msg: Uint8Array): boolean {
+    verify(scheme: Scheme, pk: PublicKey, msg: Uint8Array, cipherSuite?: string): boolean {
+        const suite = cipherSuite != null ? new TextEncoder().encode(cipherSuite) : getSuite(scheme, 1);
         if (!(pk instanceof PublicKey)) {
             throw new Error("invalid public key");
         }
         const aug = scheme === "aug" ? pk.bytes() : undefined;
-        return Blst.core_verify_pk_in_g2(pk._point, this._point, true, msg, getSuite(scheme, 1), aug);
+        return Blst.core_verify_pk_in_g2(pk._point, this._point, true, msg, suite, aug);
     }
 
     valid(groupCheck: boolean = false): boolean {

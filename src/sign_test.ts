@@ -87,7 +87,7 @@ const status = await run(null, async () => {
                             const res = sig.verify(group.scheme, pub, msg);
                             assert.strictEqual(res, true, "verify failed");
 
-                            const res1 = sig.aggregateVerify(group.scheme, [pub, msg]);
+                            const res1 = sig.aggregateVerify(group.scheme, [[pub, msg]]);
                             assert.strictEqual(res1, true, "aggregate verify failed");
                         }
                     }, ctx);
@@ -115,7 +115,7 @@ const status = await run(null, async () => {
             }
 
             const aggregated = MinPk.aggregateSignatures(...sigs);
-            assert.strictEqual(aggregated.aggregateVerify("basic", ...pairs), true, "aggregate verify failed");
+            assert.strictEqual(aggregated.aggregateVerify("basic", pairs), true, "aggregate verify failed");
         }, ctx);
     });
 
@@ -180,7 +180,7 @@ const status = await run(null, async () => {
                             const res = sig.verify(group.scheme, pub, msg);
                             assert.strictEqual(res, true, "verify failed");
 
-                            const res1 = sig.aggregateVerify(group.scheme, [pub, msg]);
+                            const res1 = sig.aggregateVerify(group.scheme, [[pub, msg]]);
                             assert.strictEqual(res1, true, "aggregate verify failed");
                         }
                     }, ctx);
@@ -208,7 +208,7 @@ const status = await run(null, async () => {
             }
 
             const aggregated = MinSig.aggregateSignatures(...sigs);
-            assert.strictEqual(aggregated.aggregateVerify("basic", ...pairs), true, "aggregate verify failed");
+            assert.strictEqual(aggregated.aggregateVerify("basic", pairs), true, "aggregate verify failed");
         }, ctx);
     });
 });

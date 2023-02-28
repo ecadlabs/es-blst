@@ -31,8 +31,7 @@
     "dist/minpk.d.ts",
     "dist/minpk.js",
     "dist/minsig.d.ts",
-    "dist/minsig.js",
-    "signature.json"
+    "dist/minsig.js"
   ],
   "devDependencies": {
     "@types/chai": "^4.3.4",

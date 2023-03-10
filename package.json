@@ -1,6 +1,6 @@
 {
   "name": "es-blst",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ES binding to blst BLS12-381 signature library using Wasm",
   "homepage": "https://github.com/ecadlabs/es-blst#readme",
   "keywords": [

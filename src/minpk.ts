@@ -2,7 +2,7 @@
  * Minimal-pubkey-size: public keys are points in G1, signatures are points in G2
  */
 import {
-    Blst, getSuite, type Scheme, type PkMsgPair,
+    Blst, getSuite, Scheme, PkMsgPair,
     ScalarByteLength, P1CompressedByteLength, P2CompressedByteLength
 } from "./blst.js";
 

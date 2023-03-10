@@ -3,7 +3,7 @@
  */
 
 import {
-    Blst, getSuite, type Scheme, type PkMsgPair,
+    Blst, getSuite, Scheme, PkMsgPair,
     ScalarByteLength, P1CompressedByteLength, P2CompressedByteLength
 } from "./blst.js";
 

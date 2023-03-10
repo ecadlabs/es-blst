@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { MinPk, MinSig, type Scheme } from "./index.js";
+import { MinPk, MinSig, Scheme } from "./index.js";
 import { run } from "./testing.js";
 import * as fs from "node:fs";
 import * as readline from "node:readline";

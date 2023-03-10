@@ -3,5 +3,6 @@
     "C_Cpp.loggingLevel": "Warning",
     "[typescript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"
-    }
+    },
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

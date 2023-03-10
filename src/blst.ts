@@ -914,7 +914,7 @@ export const Blst = new BlstWrapper(
                 const buf = await fs.readFile(url);
                 return await WebAssembly.instantiate(buf);
             } else {
-                return await WebAssembly.instantiateStreaming(fetch(url));
+                return await WebAssembly.instantiateStreaming(fetch(url.toString()));
             }
         })()
     ).instance

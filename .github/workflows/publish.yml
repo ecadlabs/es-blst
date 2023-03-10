@@ -1,7 +1,9 @@
 name: Build and publish
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
+    tags: [v*]
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest

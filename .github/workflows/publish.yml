@@ -31,8 +31,9 @@ jobs:
           echo ${VERDACCIO_TOKEN} >> ~/.npmrc
           SHORT_SHA=$(echo ${{ github.event.pull_request.head.sha }} | cut -c1-8)
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          BRANCH_NAME=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
           echo $SHORT_SHA
+          echo $BRANCH_NAME
           PR_VERSION="${PACKAGE_VERSION}-${BRANCH_NAME}.${SHORT_SHA}"
           echo "::set-output name=pr-version::$PR_VERSION"
           npm version "${PR_VERSION}" --no-push --no-git-tag-version --yes

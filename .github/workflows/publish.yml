@@ -1,7 +1,8 @@
 name: Build and publish
 on:
   push:
-    - build-compatibility
+    branches:
+      - build-compatibility
   release:
     types: [published]
 jobs:

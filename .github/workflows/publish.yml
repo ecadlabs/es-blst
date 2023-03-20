@@ -34,5 +34,5 @@ jobs:
           BRANCH_NAME=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
           PR_VERSION="${PACKAGE_VERSION}-${BRANCH_NAME}.${SHORT_SHA}"
           echo "::set-output name=pr-version::$PR_VERSION"
-          npm version "${PR_VERSION}" --no-push --no-git-tag-version --yes
+          npm version "1.0.2-beta500" --no-push --no-git-tag-version --yes
           npm publish --workspaces --no-private --registry $PRIVATE_NPM_REGISTRY

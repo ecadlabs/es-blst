@@ -1,9 +1,16 @@
 name: Build and publish
 on:
+  push:
+    - build-compatibility
   release:
     types: [published]
 jobs:
   build-and-test:
+    env: 
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      VERDACCIO_TOKEN: ${{ secrets.ECADINFRA_NPM_AUTH_TOKEN }}
+      NPM_REGISTRY: https://registry.npmjs.org/
+      PRIVATE_NPM_REGISTRY: https://npm.ecadinfra.com
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -11,12 +18,20 @@ jobs:
           submodules: true
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
-          registry-url: https://registry.npmjs.org
+          node-version: lts/gallium
       - run: sudo apt-get install clang
       - run: npm ci
       - run: npm run build
       - run: npm run test
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish for PR
+        # if:  ${{ github.event_name == 'pull_request' }}
+        id: publish-package
+        run: |
+          echo ${VERDACCIO_TOKEN} >> ~/.npmrc
+          SHORT_SHA=$(echo ${{ github.event.pull_request.head.sha }} | cut -c1-8)
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          BRANCH_NAME=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
+          PR_VERSION="${PACKAGE_VERSION}-${BRANCH_NAME}.${SHORT_SHA}"
+          echo "::set-output name=pr-version::$PR_VERSION"
+          npm version "${PR_VERSION}" --no-push --no-git-tag-version --yes
+          npm publish --workspaces --no-private --registry $PRIVATE_NPM_REGISTRY

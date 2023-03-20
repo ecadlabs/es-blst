@@ -29,7 +29,7 @@ jobs:
         id: publish-package
         run: |
           echo ${VERDACCIO_TOKEN} >> ~/.npmrc
-          SHORT_SHA=${{ github.sha:0:7 }}
+          SHORT_SHA=$(echo ${{ github.event.pull_request.head.sha }} | cut -c1-8)
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           BRANCH_NAME=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
           echo $SHORT_SHA

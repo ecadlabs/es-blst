@@ -244,6 +244,18 @@ async function start() {
       }, ctx);
     }, ctx);
   });
+  return status;
 }
 
-process.exit(status ? 0 : 1);
+let result;
+
+(async () => {
+  try {
+    result = await start();
+  } catch (e) {
+    console.log(e);
+  }
+})();
+
+
+process.exit(result ? 0 : 1);

@@ -5,7 +5,7 @@
 import {
   Blst, getSuite, Scheme, PkMsgPair,
   ScalarByteLength, P1CompressedByteLength, P2CompressedByteLength
-} from "./blst.js";
+} from "./blst";
 
 export class PrivateKey {
   static readonly ByteLength = ScalarByteLength;

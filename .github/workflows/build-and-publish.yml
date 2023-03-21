@@ -32,7 +32,8 @@ jobs:
           SHORT_SHA=$(echo ${{ github.event.pull_request.head.sha }} | cut -c1-8)
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           PR_NUMBER=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
-          PR_VERSION="${PACKAGE_VERSION}-${PR_NUMBER}.${SHORT_SHA}" >> $GITHUB_ENV
+          PR_VERSION="${PACKAGE_VERSION}-${PR_NUMBER}.${SHORT_SHA}"
+          echo "PR_VERSION=${PACKAGE_VERSION}-${PR_NUMBER}.${SHORT_SHA}" >> $GITHUB_ENV
           npm version "${PR_VERSION}" --no-push --no-git-tag-version --yes
           npm publish --no-private --registry $PRIVATE_NPM_REGISTRY
       - name: Publish for a release

@@ -244,18 +244,15 @@ async function start() {
       }, ctx);
     }, ctx);
   });
-  return status;
 }
-
-let result;
 
 (async () => {
   try {
-    result = await start();
+    await start();
   } catch (e) {
     console.log(e);
   }
 })();
 
 
-process.exit(result ? 0 : 1);
+process.exit(status ? 0 : 1);

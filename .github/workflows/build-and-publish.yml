@@ -32,8 +32,7 @@ jobs:
           SHORT_SHA=$(echo ${{ github.event.pull_request.head.sha }} | cut -c1-8)
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           PR_NUMBER=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
-          PR_VERSION="${PACKAGE_VERSION}-${PR_NUMBER}.${SHORT_SHA}"
-          echo "::set-output name=pr-version::$PR_VERSION"
+          echo "PR_VERSION=${PACKAGE_VERSION}-${PR_NUMBER}.${SHORT_SHA}" >> $GITHUB_ENV
           npm version "${PR_VERSION}" --no-push --no-git-tag-version --yes
           npm publish --no-private --registry $PRIVATE_NPM_REGISTRY
       - name: Publish for a release
@@ -42,3 +41,13 @@ jobs:
         run: |
           echo ${NODE_AUTH_TOKEN} >> ~/.npmrc
           npm publish --registry $NPM_REGISTRY
+      - name: PR comment
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: deploy-packages
+          message: |
+            A new preview version of the package has been published to https://npm.ecadinfra.com/
+            ```
+            npm i es-blst@${PR_VERSION} --registry https://npm.ecadinfra.com/
+            ```

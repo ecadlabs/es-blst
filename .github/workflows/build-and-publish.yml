@@ -49,6 +49,3 @@ jobs:
           header: deploy-packages
           message: |
             A new preview version of the package has been published to https://npm.ecadinfra.com/
-            ```
-            npm i es-blst@${PR_VERSION} --registry https://npm.ecadinfra.com/
-            ```

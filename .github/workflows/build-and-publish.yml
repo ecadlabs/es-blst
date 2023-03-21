@@ -1,0 +1,53 @@
+name: Build and publish
+on:
+  pull_request:
+    branches:
+      - main
+  release:
+    types: [published]
+jobs:
+  build-and-test:
+    env: 
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      VERDACCIO_TOKEN: ${{ secrets.ECADINFRA_NPM_AUTH_TOKEN }}
+      NPM_REGISTRY: https://registry.npmjs.org/
+      PRIVATE_NPM_REGISTRY: https://npm.ecadinfra.com
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/gallium
+      - run: sudo apt-get install clang
+      - run: npm ci
+      - run: npm run build
+      - name: Publish for PR
+        if: ${{ github.event_name == 'pull_request' }}
+        id: publish-pr
+        run: |
+          echo ${VERDACCIO_TOKEN} >> ~/.npmrc
+          SHORT_SHA=$(echo ${{ github.event.pull_request.head.sha }} | cut -c1-8)
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          PR_NUMBER=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
+          PR_VERSION="${PACKAGE_VERSION}-${PR_NUMBER}.${SHORT_SHA}"
+          echo "pr_version=${PACKAGE_VERSION}-${PR_NUMBER}.${SHORT_SHA}" >> $GITHUB_OUTPUT
+          npm version "${PR_VERSION}" --no-push --no-git-tag-version --yes
+          npm publish --no-private --registry $PRIVATE_NPM_REGISTRY
+      - name: Publish for a release
+        if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+        id: publish-release
+        run: |
+          echo ${NODE_AUTH_TOKEN} >> ~/.npmrc
+          npm publish --registry $NPM_REGISTRY
+      - name: PR comment
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: deploy-packages
+          message: |
+            A new preview version of the package has been published to https://npm.ecadinfra.com/
+            ```
+            npm i es-blst@${{ steps.publish-pr.outputs.pr_version }} --registry https://npm.ecadinfra.com/
+            ```
